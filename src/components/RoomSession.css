@@ -5,3 +5,9 @@
     justify-content: center;
     height: 100vh;
 }
+
+video {
+    width: 320px;
+    height: 240px;
+    background: #000;   
+}
