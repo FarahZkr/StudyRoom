@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Webcam from 'react-webcam';
 import './RoomSession.css';
 import {
   LiveKitRoom,
@@ -9,7 +10,7 @@ import '@livekit/components-styles';
 function RoomSession() {
   const [token, setToken] = useState(null);
   const LIVEKIT_URL = "wss://studyrooms-z2ioh2bj.livekit.cloud";
-  
+
   const connect = async () => {
     const response = await fetch("http://localhost:3000/connect", {
       method: "POST",
@@ -23,6 +24,10 @@ function RoomSession() {
   if (!token) {
     return (
       <div className='main'>
+        <div className="webcam-container">
+          {/* <Webcam height={480} width={640} /> */}
+        </div>
+        <input type='text'/>
         <button onClick={connect}>Join Room</button>
       </div>
     );

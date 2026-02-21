@@ -1,40 +1,57 @@
-const fetch = require("node-fetch");
 require("dotenv").config();
-
+const fetch = require("node-fetch");
 const express = require("express");
 const cors = require("cors");
-const app = express();
-// const mongoose = require("mongoose");
+const mongoose = require("mongoose");
+const { AccessToken } = require("livekit-server-sdk");
 
+const app = express();
 app.use(cors());
 app.use(express.json());
 
-// app.use((req, res, next) => {
-//   console.log(req.path, req.method);
-//   next();
-// });
-// // ROUTES
-// app.use("/palz/users", userRoutes);
-// // use defaults if env values missing
-// const PORT = process.env.PORT || 3000;
-// const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/studyroom";
+const PORT = process.env.PORT || 3000;
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/studyroom";
 
-// mongoose
-//   .connect(MONGODB_URI)
-//   .then(() => {
-//     app.listen(PORT, () => {
-//       console.log(`Connected to DB & listening on port ${PORT}!`);
-//     });
-//   })
-//   .catch((error) => console.log(error));
+// ----------------- MONGODB -----------------
+const roomSchema = new mongoose.Schema({
+  roomId: { type: String, required: true, unique: true },
+  isPrivate: { type: Boolean, default: false },
+  maxUsers: { type: Number, default: 6 },
+  createdAt: { type: Date, default: Date.now },
+  expiresAt: { type: Date },
+});
 
-const { AccessToken } = require("livekit-server-sdk");
+roomSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+const Room = mongoose.model("Room", roomSchema);
 
-// ----------------- LIVEKIT API -----------------
+// ----------------- ROUTES -----------------
+
+// List public rooms
+app.get("/rooms", async (req, res) => {
+  try {
+    const rooms = await Room.find({ isPrivate: false });
+    res.json(rooms);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Connect / join room
 app.post("/connect", async (req, res) => {
   try {
     const { roomName, participantName } = req.body;
-    console.log("roomName:", roomName, "participantName:", participantName);
+
+    let room = await Room.findOne({ roomId: roomName });
+    if (!room) {
+      room = new Room({
+        roomId: roomName,
+        isPrivate: false,
+        maxUsers: 6,
+        expiresAt: new Date(Date.now() + 1000 * 60 * 60), // 1 hour TTL
+      });
+      await room.save();
+      console.log("Created new room:", roomName);
+    }
 
     const token = new AccessToken(
       process.env.LIVEKIT_API_KEY,
@@ -50,8 +67,6 @@ app.post("/connect", async (req, res) => {
     });
 
     const jwt = await token.toJwt();
-    console.log("Generated token:", jwt);
-
     res.json({ token: jwt });
   } catch (err) {
     console.log("Error:", err);
@@ -59,5 +74,12 @@ app.post("/connect", async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// ----------------- START SERVER -----------------
+mongoose
+  .connect(MONGODB_URI)
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Connected to DB & listening on port ${PORT}!`);
+    });
+  })
+  .catch((error) => console.log(error));
