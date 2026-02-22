@@ -24,7 +24,7 @@ function RoomSession({ token, onLeave }) {
     <LiveKitRoom
       token={token}
       serverUrl={LIVEKIT_URL}
-      connect={false}
+      connect={true}
       video={true}
       audio={true}
       onDisconnected={onLeave}

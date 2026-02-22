@@ -3,11 +3,12 @@ const fetch = require("node-fetch");
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
-const { AccessToken, RoomServiceClient } = require("livekit-server-sdk");
+const { AccessToken, RoomServiceClient, WebhookReceiver } = require("livekit-server-sdk");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/StudyRoom";
@@ -41,6 +42,11 @@ app.post("/connect", async (req, res) => {
   try {
     const { roomName, isPrivate, maxUsers, password, action, username } = req.body;
     let room = await Room.findOne({ roomId: roomName });
+    const roomService = new RoomServiceClient(
+      process.env.LIVEKIT_URL,
+      process.env.LIVEKIT_API_KEY,
+      process.env.LIVEKIT_API_SECRET
+    );
 
     if (action === "host") {
       if (room) {
@@ -55,6 +61,10 @@ app.post("/connect", async (req, res) => {
       });
 
       await room.save();
+      // Create the room in LiveKit using the REST API
+      await roomService.createRoom({
+        name: roomName,
+      });
     }
     else {
       if (!room) {
@@ -62,6 +72,13 @@ app.post("/connect", async (req, res) => {
       }
       if (room.isPrivate && room.password !== password) {
         return res.status(401).json({ error: "Incorrect password" });
+      }
+
+      // Check room capacity using LiveKit API
+      const participants = await roomService.listParticipants(roomName);
+      if (participants.length >= room.maxUsers) {
+        console.log(`Room ${roomName} is full. Max users: ${room.maxUsers}`);
+        return res.status(403).json({ error: "Room is full" });
       }
 
       // Generate LiveKit token
@@ -83,6 +100,40 @@ app.post("/connect", async (req, res) => {
   } catch (err) {
     console.log("Error:", err);
     res.status(500).json({ error: err.message });
+  }
+});
+
+app.post("/livekit-webhook", express.raw({ type: "application/webhook+json" }), async (req, res) => {
+  try {
+    const receiver = new WebhookReceiver(
+      process.env.LIVEKIT_API_KEY,
+      process.env.LIVEKIT_API_SECRET
+    );
+
+    // This properly validates and parses the webhook
+    const event = await receiver.receive(req.body, req.get("Authorization"));
+
+    if (event.event === "participant_left" && event.room?.name) {
+      const roomName = event.room.name;
+      const roomService = new RoomServiceClient(
+        process.env.LIVEKIT_URL,
+        process.env.LIVEKIT_API_KEY,
+        process.env.LIVEKIT_API_SECRET
+      );
+
+      // Delete the room from the db if empty
+      const participantsResponse = await roomService.listParticipants(roomName);
+      const participants = participantsResponse || [];
+      if (participants.length === 0) {
+        await Room.deleteOne({ roomId: roomName });
+        console.log(`Deleted empty room ${roomName}`);
+      }
+    }
+
+    res.sendStatus(200);
+  } catch (err) {
+    console.error("Webhook error:", err);
+    res.sendStatus(500);
   }
 });
 

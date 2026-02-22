@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import './RoomsList.css';
+import "./RoomsList.css";
 import { useParticipants } from "@livekit/components-react";
 
-function RoomList({setToken, username}) {
+function RoomList({ setToken, username }) {
   const [rooms, setRooms] = useState([]);
 
   useEffect(() => {
@@ -13,18 +13,34 @@ function RoomList({setToken, username}) {
   }, []);
 
   const joinRoom = async (roomName) => {
-    if(!username) {
+    if (!username) {
       alert("Please enter a username before joining a room.");
       return;
     }
-    const response = await fetch("http://localhost:3000/connect", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ roomName: roomName, isPrivate: false, maxUsers: "", password: "", username: username, action: "join" }),
-    });
-    const data = await response.json();
-    console.log("Received token from server:", data.token);
-    setToken(data.token);    
+    try {
+      const response = await fetch("http://localhost:3000/connect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          roomName: roomName,
+          isPrivate: false,
+          maxUsers: "",
+          password: "",
+          username: username,
+          action: "join",
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        // Show specific backend error message
+        alert(data.error || "Something went wrong");
+        return;
+      }
+      setToken(data.token);
+    } catch (err) {
+      console.error("Error joining room:", err);
+      alert("Failed to join room. Please try again.");
+    }
   };
 
   // function ParticipantCount() {
@@ -38,7 +54,9 @@ function RoomList({setToken, username}) {
       <ul>
         {rooms.map((room) => (
           <li key={room._id}>
-            <button type="button" onClick={() => joinRoom(room.roomId)}>{room.roomId}</button>
+            <button type="button" onClick={() => joinRoom(room.roomId)}>
+              {room.roomId}
+            </button>
           </li>
         ))}
       </ul>
