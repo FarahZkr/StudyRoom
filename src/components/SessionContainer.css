@@ -1,0 +1,68 @@
+.session-container-parent {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.session-container {
+    border: 1px solid;
+    width: 400px;
+    border-radius: 8px;
+    background: #ffffff7d;
+    border: 1px solid lightgray;
+}
+
+.container-top {
+    display: flex;
+    justify-content: space-around;
+    padding: 5px;
+    gap: 5px;
+}
+
+.tab {
+    padding: 10px;
+    border: 1px solid lightgray;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+}
+
+.tab.selected {
+    background: #f8f8f8;
+}
+
+.host-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+}
+
+.participants-container {
+    display: flex;
+}
+
+.host-container label {
+    text-align: left;
+}
+
+#MaxUsers {
+    width: 100%;
+}
+
+.server-pass-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.server-pass-container.hidden {
+    display: none;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}

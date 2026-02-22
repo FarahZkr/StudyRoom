@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import Webcam from 'react-webcam';
 import './RoomSession.css';
 import {
@@ -7,39 +7,27 @@ import {
 } from '@livekit/components-react';
 import '@livekit/components-styles';
 
-function RoomSession() {
-  const [token, setToken] = useState(null);
+function RoomSession({ token, onLeave }) {
   const LIVEKIT_URL = "wss://studyrooms-z2ioh2bj.livekit.cloud";
 
-  const connect = async () => {
-    const response = await fetch("http://localhost:3000/connect", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ roomName: "test-room", participantName: "User" }),
-    });
-    const data = await response.json();
-    setToken(data.token);
-  };
+  useEffect(() => { 
+    console.log("RoomSession received token:", token);
+  }, [token]);
 
   if (!token) {
-    return (
-      <div className='main'>
-        <div className="webcam-container">
-          {/* <Webcam height={480} width={640} /> */}
-        </div>
-        <input type='text'/>
-        <button onClick={connect}>Join Room</button>
-      </div>
-    );
+    return (<div></div>);
   }
-
+//  <div className="webcam-container">
+//           {/* <Webcam height={480} width={640} /> */}
+//         </div>
   return (
     <LiveKitRoom
       token={token}
       serverUrl={LIVEKIT_URL}
-      connect={true}
+      connect={false}
       video={true}
       audio={true}
+      onDisconnected={onLeave}
     >
       <VideoConference />
     </LiveKitRoom>

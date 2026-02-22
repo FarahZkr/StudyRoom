@@ -3,29 +3,29 @@ const fetch = require("node-fetch");
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
-const { AccessToken } = require("livekit-server-sdk");
+const { AccessToken, RoomServiceClient } = require("livekit-server-sdk");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/studyroom";
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/StudyRoom";
 
 // ----------------- MONGODB -----------------
 const roomSchema = new mongoose.Schema({
   roomId: { type: String, required: true, unique: true },
   isPrivate: { type: Boolean, default: false },
   maxUsers: { type: Number, default: 6 },
+  password: { type: String },
   createdAt: { type: Date, default: Date.now },
   expiresAt: { type: Date },
 });
 
 roomSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
-const Room = mongoose.model("Room", roomSchema);
+const Room = mongoose.model("rooms", roomSchema);
 
 // ----------------- ROUTES -----------------
-
 // List public rooms
 app.get("/rooms", async (req, res) => {
   try {
@@ -39,35 +39,47 @@ app.get("/rooms", async (req, res) => {
 // Connect / join room
 app.post("/connect", async (req, res) => {
   try {
-    const { roomName, participantName } = req.body;
-
+    const { roomName, isPrivate, maxUsers, password, action, username } = req.body;
     let room = await Room.findOne({ roomId: roomName });
-    if (!room) {
+
+    if (action === "host") {
+      if (room) {
+        return res.status(400).json({ error: "Room name already exists" });
+      }
       room = new Room({
         roomId: roomName,
-        isPrivate: false,
-        maxUsers: 6,
-        expiresAt: new Date(Date.now() + 1000 * 60 * 60), // 1 hour TTL
+        isPrivate: isPrivate,
+        maxUsers: maxUsers,
+        password: password,
+        expiresAt: new Date(Date.now() + 1000 * 60 * 60),
       });
+
       await room.save();
-      console.log("Created new room:", roomName);
     }
+    else {
+      if (!room) {
+        return res.status(404).json({ error: "Room not found" });
+      }
+      if (room.isPrivate && room.password !== password) {
+        return res.status(401).json({ error: "Incorrect password" });
+      }
 
-    const token = new AccessToken(
-      process.env.LIVEKIT_API_KEY,
-      process.env.LIVEKIT_API_SECRET,
-      { identity: participantName }
-    );
+      // Generate LiveKit token
+      const token = new AccessToken(
+        process.env.LIVEKIT_API_KEY,
+        process.env.LIVEKIT_API_SECRET,
+        { identity: username, name: username }
+      );
+      token.addGrant({
+        roomJoin: true,
+        room: roomName,
+        canPublish: true,
+        canSubscribe: true,
+      });
 
-    token.addGrant({
-      roomJoin: true,
-      room: roomName,
-      canPublish: true,
-      canSubscribe: true,
-    });
-
-    const jwt = await token.toJwt();
-    res.json({ token: jwt });
+      const jwt = await token.toJwt();
+      res.json({ token: jwt });
+    }
   } catch (err) {
     console.log("Error:", err);
     res.status(500).json({ error: err.message });
