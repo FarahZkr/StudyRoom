@@ -26,7 +26,7 @@ function RoomList({ setToken, username }) {
           isPrivate: false,
           maxUsers: "",
           password: "",
-          username: username,
+          username: username.trim(),
           action: "join",
         }),
       });

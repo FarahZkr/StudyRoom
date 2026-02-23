@@ -60,5 +60,5 @@ input[type=number] {
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }

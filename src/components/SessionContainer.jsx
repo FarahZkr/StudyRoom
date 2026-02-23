@@ -39,7 +39,7 @@ function SessionContainer({token, username}) {
             <PrivateServer />
           </div>
           <div className="tab-content">
-            <HostSession />
+            <HostSession setToken={token} username={username} />
           </div>
         </div>
       </div>

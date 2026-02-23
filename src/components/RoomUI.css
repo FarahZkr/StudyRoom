@@ -1,0 +1,235 @@
+.room {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #222;
+}
+
+.main-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: auto;
+    /* max-width: 1200px; */
+    flex: 1;
+}
+.chat {
+    display: flex;
+    flex-direction: column;
+    width: 400px;
+    height: 100%;
+    background: #2a2a2a;
+    border-left: 1px solid #3a3a3a;
+}
+
+.msg-container {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.msg-sender {
+    margin-left: 40px;
+    font-size: 11px;
+    color: #7a7a7a;
+    margin-bottom: 5px;
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.chat-message {
+    display: flex;
+    flex-direction: row;
+    gap: 2px;
+}
+
+.chat-sender {
+    font-size: 11px;
+    font-weight: bold;
+    color: white;
+    text-align: left;
+    background: linear-gradient(45deg, #2e319c, #a381c2);
+    padding: 5px;
+    height: fit-content;
+    border-radius: 5px;
+    margin-top: 2px;
+    margin-right: 5px;
+    min-width: 15px;
+    text-align: center;
+}
+
+.chat-text {
+    font-size: 13px;
+    color: #e0e0e0;
+    background: #333;
+    padding: 6px 10px;
+    border-radius: 8px;
+    word-break: break-word;
+    width: fit-content;
+    text-align: left;
+}
+
+.chat-input {
+    display: flex;
+    padding: 10px;
+    gap: 6px;
+    border-top: 1px solid #3a3a3a;
+}
+
+.chat-input input {
+    flex: 1 1;
+    background: #333;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 10px;
+    color: white;
+    font-size: 13px;
+    outline: none;
+}
+
+.chat-input button {
+    display: flex;
+    background: #e3e3e3;
+    color: black;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 12px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.chat-input button:hover {
+    background: #cfcfcf;
+}
+
+.chat-input button:active {
+    background: #b0b0b0;
+}
+
+.chat-input button svg {
+    width: 18px;
+}
+
+.video-container {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+}
+
+.video-grid {
+    display: grid;
+    gap: 10px;
+    width: 100%;
+    max-width: 1200px;
+    max-height: calc(100vh - 80px);
+    align-content: center;
+    padding: 10px;
+    justify-items: center;
+}
+
+.speaking-indicator {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 98.2%;
+    height: 97%;
+    border-radius: 10px;
+    pointer-events: none;
+    border: 5px solid #68f6c6;
+}
+
+.participant-tile {
+    position: relative;
+    background-color: #333;
+    border-radius: 10px;
+    overflow: hidden;
+    aspect-ratio: 16/9;
+    min-width: 0;
+    width: 100%;
+    max-height: 100%;
+    max-width: 900px;
+}
+
+.participant-tile video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.participant-name {
+    position: absolute;
+    bottom: 9px;
+    left: 9px;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+.mute-icon {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    background: #ff3c3ccf;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    right: 9px;
+    bottom: 9px;
+}
+
+.mute-icon svg {
+    width: 12px;
+    height: 12px;
+    color: white
+}
+
+.camera-off-overlay {
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgb(88 86 173 / 91%) 0%, rgb(81 88 114) 100%)
+    /* background: radial-gradient(circle, rgb(122 88 137) 0%, rgb(68 83 137) 100%); */
+    /* radial-gradient(circle, rgb(122 88 137) 0%, rgb(46 54 82) 100%); */
+}
+
+.camera-off-overlay span {
+    background: linear-gradient(45deg, #6eacca, #ba7bffcf);
+    width: 7rem;
+    height: 7rem;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    font-size: 3.5rem;
+    color: white;
+    border: 1px solid #cfcfcf;
+    user-select: none;
+}
+
+
+.controls {
+    width: 100%;
+    background: #303030;
+    z-index: 10;
+}
+
+.controls-container {
+    padding: 10px;
+}

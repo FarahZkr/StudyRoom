@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-function HostSession() {
+function HostSession({setToken, username}) {
   const [roomName, setRoomName] = useState("");
   const [roomPass, setRoomPass] = useState("");
   const [maxUsers, setMaxUsers] = useState(5);
@@ -24,13 +24,18 @@ function HostSession() {
     const response = await fetch("http://localhost:3000/connect", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ roomName: roomName, isPrivate: isPrivate, maxUsers: maxUsers, password: roomPass, action: "host" }),
+      body: JSON.stringify({ roomName: roomName, isPrivate: isPrivate, maxUsers: maxUsers, password: roomPass, action: "host", username: username.trim() }),
     });
     // Get token if needed
-    // const data = await response.json();
+    const data = await response.json();
+    setToken(data.token);
   };
 
   function validateForm(roomName, roomPass, isPrivate) {
+    if (!username) {
+      alert("Please enter a username before hosting a room.");
+      return;
+    }
     if (roomName.trim() === "") {
       alert("Room name cannot be empty");
       return false;

@@ -6,6 +6,7 @@ import {
   VideoConference,
 } from '@livekit/components-react';
 import '@livekit/components-styles';
+import RoomUI from './RoomUI';
 
 function RoomSession({ token, onLeave }) {
   const LIVEKIT_URL = "wss://studyrooms-z2ioh2bj.livekit.cloud";
@@ -27,9 +28,8 @@ function RoomSession({ token, onLeave }) {
       connect={true}
       video={true}
       audio={true}
-      onDisconnected={onLeave}
     >
-      <VideoConference />
+      <RoomUI onLeave={onLeave}/>
     </LiveKitRoom>
   );
 }

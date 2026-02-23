@@ -65,6 +65,22 @@ app.post("/connect", async (req, res) => {
       await roomService.createRoom({
         name: roomName,
       });
+
+      // Generate LiveKit token
+      const token = new AccessToken(
+        process.env.LIVEKIT_API_KEY,
+        process.env.LIVEKIT_API_SECRET,
+        { identity: username, name: username }
+      );
+      token.addGrant({
+        roomJoin: true,
+        room: roomName,
+        canPublish: true,
+        canSubscribe: true,
+      });
+
+      const jwt = await token.toJwt();
+      res.json({ token: jwt });
     }
     else {
       if (!room) {
