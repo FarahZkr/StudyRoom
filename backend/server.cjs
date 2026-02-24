@@ -7,10 +7,17 @@ const { AccessToken, RoomServiceClient, WebhookReceiver } = require("livekit-ser
 
 const app = express();
 app.use(cors({
-  origin: [
-    "https://study-room-g5xmk0vt3-farahzkrs-projects.vercel.app",
-    "http://localhost:3001"
-  ]
+  origin: (origin, callback) => {
+    if (
+      !origin ||
+      origin === "http://localhost:3001" ||
+      origin.includes("study-room") && origin.endsWith(".vercel.app")
+    ) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  }
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
