@@ -61,6 +61,7 @@
     font-size: 12px;
     font-weight: 500;
     backdrop-filter: blur(4px);
+    z-index: 10;
 }
 
 .speaking-indicator {
@@ -84,6 +85,7 @@
     right: 10px;
     bottom: 10px;
     backdrop-filter: blur(4px);
+    z-index: 10;
 }
 
 .mute-icon svg {
