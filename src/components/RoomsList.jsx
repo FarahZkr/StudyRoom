@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import "./RoomsList.css";
-import { useParticipants } from "@livekit/components-react";
 
 function RoomList({ setToken, username }) {
   const [rooms, setRooms] = useState([]);

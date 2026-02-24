@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "./SessionContainer.css";
 import HostSession from "./HostSession";
 import PrivateServer from "./PrivateSession";

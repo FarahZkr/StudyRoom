@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import logo from './logo.svg';
+import { useState } from 'react';
 import './App.css';
 import RoomSession from './components/RoomSession';
-import RoomsList from './components/RoomsList';
 import SessionContainer from './components/SessionContainer';
 
 function App() {

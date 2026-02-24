@@ -1,9 +1,8 @@
-import React, { useState, useEffect, use } from 'react';
+import React, { useEffect } from 'react';
 import Webcam from 'react-webcam';
 import './RoomSession.css';
 import {
   LiveKitRoom,
-  VideoConference,
 } from '@livekit/components-react';
 import '@livekit/components-styles';
 import RoomUI from './RoomUI';
@@ -18,9 +17,7 @@ function RoomSession({ token, onLeave }) {
   if (!token) {
     return (<div></div>);
   }
-//  <div className="webcam-container">
-//           {/* <Webcam height={480} width={640} /> */}
-//         </div>
+
   return (
     <LiveKitRoom
       token={token}
