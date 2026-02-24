@@ -6,7 +6,12 @@ const mongoose = require("mongoose");
 const { AccessToken, RoomServiceClient, WebhookReceiver } = require("livekit-server-sdk");
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: [
+    "https://study-room-g5xmk0vt3-farahzkrs-projects.vercel.app",
+    "http://localhost:3001"
+  ]
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
