@@ -3,6 +3,7 @@ import { useState } from "react";
 function PrivateServer({ setToken, username }) {
   const [roomName, setRoomName] = useState("");
   const [password, setPassword] = useState("");
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:3000";
 
   const joinPrivateRoom = async () => {
     if (roomName.trim() === "") return alert("Room name cannot be empty");
@@ -10,7 +11,7 @@ function PrivateServer({ setToken, username }) {
     if (!username) return alert("Please enter a username first");
 
     try {
-      const response = await fetch("http://localhost:3000/connect", {
+      const response = await fetch(`${API_URL}/connect`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -3,9 +3,10 @@ import "./RoomsList.css";
 
 function RoomList({ setToken, username }) {
   const [rooms, setRooms] = useState([]);
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:3000";
 
   useEffect(() => {
-    fetch("http://localhost:3000/rooms")
+    fetch(`${API_URL}/rooms`)
       .then((res) => res.json())
       .then((data) => setRooms(data))
       .catch((err) => console.error("Error fetching rooms:", err));
@@ -17,7 +18,7 @@ function RoomList({ setToken, username }) {
       return;
     }
     try {
-      const response = await fetch("http://localhost:3000/connect", {
+      const response = await fetch(`${API_URL}/connect`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -5,6 +5,7 @@ function HostSession({setToken, username}) {
   const [roomPass, setRoomPass] = useState("");
   const [maxUsers, setMaxUsers] = useState(5);
   const [isPrivate, setIsPrivate] = useState(false);
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:3000";
 
   function modifyMaxUsers(change) {
     setMaxUsers((prev) => {
@@ -21,7 +22,7 @@ function HostSession({setToken, username}) {
 
   const hostRoom = async () => {
     if(!validateForm(roomName, roomPass, isPrivate)) return;
-    const response = await fetch("http://localhost:3000/connect", {
+    const response = await fetch(`${API_URL}/connect`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ roomName: roomName, isPrivate: isPrivate, maxUsers: maxUsers, password: roomPass, action: "host", username: username.trim() }),
