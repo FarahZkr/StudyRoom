@@ -5,7 +5,8 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: #222;
+    background-color: #cfcbe1;
+    /* background-color: #222; */
 }
 
 .main-container {
@@ -16,6 +17,7 @@
     /* max-width: 1200px; */
     flex: 1;
 }
+
 .chat {
     display: flex;
     flex-direction: column;
@@ -139,24 +141,21 @@
 
 .speaking-indicator {
     position: absolute;
-    top: 0px;
-    left: 0px;
-    width: 98.2%;
-    height: 97%;
+    inset: 0;
     border-radius: 10px;
     pointer-events: none;
-    border: 5px solid #68f6c6;
+    border: 4px solid #68f6c6;
+    z-index: 1;
 }
 
 .participant-tile {
     position: relative;
-    background-color: #333;
     border-radius: 10px;
     overflow: hidden;
     aspect-ratio: 16/9;
     min-width: 0;
     width: 100%;
-    max-height: 100%;
+    max-height: 99%;
     max-width: 900px;
 }
 
@@ -225,11 +224,44 @@
 
 
 .controls {
-    width: 100%;
+    /* width: 100%;
     background: #303030;
+    z-index: 10; */
+    width: fit-content;
+    background: #7e7e9280;
     z-index: 10;
+    border-radius: 10px;
+    padding: 4px 20px;
+    border: 1px solid #dededee0;
+    margin-bottom: 2rem;
 }
 
 .controls-container {
+    display: flex;
     padding: 10px;
+    gap: 10px;
+}
+
+.controls-container button {
+    background: #ffffff45;
+    outline: none;
+    border: 1px solid #ffffff78;
+    border-radius: 5px;
+    padding: 6px 7px;
+    display: flex;
+    cursor: pointer;
+}
+
+.controls-container button:hover {
+    background: #ffffff78 !important;
+}
+
+.controls-container button:active {
+    background: #cdcad661 !important;
+}
+
+.controls svg {
+    width: 24px;
+    color: white;
+    user-select: none;
 }
