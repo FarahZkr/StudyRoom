@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import "./RoomsList.css";
 
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:3000";
+
 function RoomList({ setToken, username }) {
   const [rooms, setRooms] = useState([]);
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:3000";
 
   useEffect(() => {
     fetch(`${API_URL}/rooms`)

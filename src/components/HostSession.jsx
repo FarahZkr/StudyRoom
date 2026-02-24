@@ -1,11 +1,12 @@
 import { useState } from "react";
 
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:3000";
+
 function HostSession({setToken, username}) {
   const [roomName, setRoomName] = useState("");
   const [roomPass, setRoomPass] = useState("");
   const [maxUsers, setMaxUsers] = useState(5);
   const [isPrivate, setIsPrivate] = useState(false);
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:3000";
 
   function modifyMaxUsers(change) {
     setMaxUsers((prev) => {

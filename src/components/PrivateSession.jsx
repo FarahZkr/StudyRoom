@@ -1,9 +1,10 @@
 import { useState } from "react";
 
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:3000";
+
 function PrivateServer({ setToken, username }) {
   const [roomName, setRoomName] = useState("");
   const [password, setPassword] = useState("");
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:3000";
 
   const joinPrivateRoom = async () => {
     if (roomName.trim() === "") return alert("Room name cannot be empty");
