@@ -4,41 +4,70 @@ import HostSession from "./HostSession";
 import PrivateServer from "./PrivateSession";
 import RoomsList from "./RoomsList";
 
-function SessionContainer({token, username}) {
+function SessionContainer({ token, username, setUsername }) {
   const [tabId, setTabId] = useState(1);
 
-  function handleTabClick(id) {
-    const hostBtn = document.getElementById("hostBtn");
-    const tabs = document.querySelectorAll(".tab");
-    const contents = document.querySelectorAll(".tab-content");
-    tabs.forEach((t) => t.classList.remove("selected"));
-    tabs[id-1].classList.add("selected");
-
-    contents.forEach((c) => c.classList.remove("active"));
-    contents[id-1].classList.add("active");
-    hostBtn.classList.add("hidden");
-    if(id === 1) {
-      hostBtn.classList.remove("hidden");
-    }
-  }
+  const getInitials = (identity) => {
+    return identity
+      .split(" ")
+      .filter((word) => /[a-zA-Z]/.test(word))
+      .map((word) =>
+        word
+          .replace(/[^a-zA-Z]/g, "")
+          .charAt(0)
+          .toUpperCase(),
+      )
+      .join("")
+      .slice(0, 2);
+  };
 
   return (
     <div className="session-container-parent">
       <div className="session-container">
-        <div className="container-top">
-          <button type="button" className="tab selected" onClick={()=>handleTabClick(1)}>Public Servers</button>
-          <button type="button" className="tab" onClick={()=>handleTabClick(2)}>Private Server</button>
+         <div className="username-section">
+          <div className="username-field">
+            <div className="username-avatar">
+              {username ? getInitials(username) : "?"}
+            </div>
+            <input
+              type="text"
+              placeholder="Enter your name to get started"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="username-input"
+            />
+          </div>
         </div>
-       
+        <div className="container-top">
+          <button
+            type="button"
+            className={`tab ${tabId === 1 ? "selected" : ""}`}
+            onClick={() => setTabId(1)}
+          >
+            Public Rooms
+          </button>
+          <button
+            type="button"
+            className={`tab ${tabId === 2 ? "selected" : ""}`}
+            onClick={() => setTabId(2)}
+          >
+            Private Room
+          </button>
+        </div>
+
         <div className="container-bottom">
-          <button className="tab" id="hostBtn" onClick={()=>handleTabClick(3)}>Host a server</button>
-          <div className="tab-content active">
-            <RoomsList setToken={token} username={username}/>
+          {tabId === 1 && (
+            <button id="hostBtn" onClick={() => setTabId(3)}>
+              + Host a Room
+            </button>
+          )}
+          <div className={`tab-content ${tabId === 1 ? "active" : ""}`}>
+            <RoomsList setToken={token} username={username} />
           </div>
-          <div className="tab-content">
-            <PrivateServer />
+          <div className={`tab-content ${tabId === 2 ? "active" : ""}`}>
+            <PrivateServer setToken={token} username={username} />
           </div>
-          <div className="tab-content">
+          <div className={`tab-content ${tabId === 3 ? "active" : ""}`}>
             <HostSession setToken={token} username={username} />
           </div>
         </div>

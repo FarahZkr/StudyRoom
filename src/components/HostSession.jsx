@@ -70,14 +70,14 @@ function HostSession({setToken, username}) {
           max={10}
           value={maxUsers}
         />
-        <button type="button" onClick={() => modifyMaxUsers(1)}>
+        <button type="button" id="addBtn" onClick={() => modifyMaxUsers(1)}>
           +
         </button>
         <button type="button" onClick={() => modifyMaxUsers(-1)}>
-          -
+          ━
         </button>
       </div>
-      <button type="button" onClick={hostRoom}>Host</button>
+      <button type="button" className="primary-btn" onClick={hostRoom}>Host</button>
     </div>
   );
 }

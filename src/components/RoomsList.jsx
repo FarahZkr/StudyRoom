@@ -43,23 +43,30 @@ function RoomList({ setToken, username }) {
     }
   };
 
-  // function ParticipantCount() {
-  //   const participants = useParticipants();
-  //   console.log("Participants in room:", participants);
-  //   // return <div>Users in room: {participants.length}</div>;
-  // }
-
   return (
-    <div>
-      <ul>
-        {rooms.map((room) => (
-          <li key={room._id}>
-            <button type="button" onClick={() => joinRoom(room.roomId)}>
-              {room.roomId}
-            </button>
-          </li>
-        ))}
-      </ul>
+    <div className="rooms-list">
+      {rooms.length === 0 ? (
+        <div className="rooms-empty">No active rooms yet</div>
+      ) : (
+        <ul>
+          {rooms.map((room) => (
+            <li key={room._id} className="room-card" onClick={() => joinRoom(room.roomId)}>
+              <div className="room-card-left">
+                <div className="room-icon">🎧</div>
+                <div className="room-info">
+                  <span className="room-name">{room.roomId}</span>
+                  <span className="room-meta">
+                    {room.participantCount ?? 0} participant{room.participantCount !== 1 ? "s" : ""}
+                  </span>
+                </div>
+              </div>
+              <button type="button" className="join-btn" onClick={(e) => { e.stopPropagation(); joinRoom(room.roomId); }}>
+                Join
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

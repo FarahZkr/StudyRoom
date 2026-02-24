@@ -30,8 +30,27 @@ const Room = mongoose.model("rooms", roomSchema);
 // List public rooms
 app.get("/rooms", async (req, res) => {
   try {
-    const rooms = await Room.find({ isPrivate: false });
-    res.json(rooms);
+    const roomService = new RoomServiceClient(
+      process.env.LIVEKIT_URL,
+      process.env.LIVEKIT_API_KEY,
+      process.env.LIVEKIT_API_SECRET
+    );
+
+    const rooms = await Room.find({isPrivate: false });
+    
+    // fetch live participant count for each room
+    const roomsWithCount = await Promise.all(
+      rooms.map(async (room) => {
+        try {
+          const participants = await roomService.listParticipants(room.roomId);
+          return { ...room.toObject(), participantCount: participants.length };
+        } catch {
+          return { ...room.toObject(), participantCount: 0 };
+        }
+      })
+    );
+
+    res.json(roomsWithCount);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
