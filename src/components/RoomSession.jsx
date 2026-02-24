@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react';
-import Webcam from 'react-webcam';
+import { useEffect } from 'react';
 import './RoomSession.css';
 import {
   LiveKitRoom,
