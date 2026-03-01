@@ -1,16 +1,22 @@
 import { useEffect, useState } from "react";
 import "./RoomsList.css";
-
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:3000";
+//process.env.REACT_APP_API_URL ||
+const API_URL =  "http://localhost:3000";
 
 function RoomList({ setToken, username }) {
   const [rooms, setRooms] = useState([]);
 
   useEffect(() => {
-    fetch(`${API_URL}/rooms`)
+    const fetchRooms = () => {
+      fetch(`${API_URL}/rooms`)
       .then((res) => res.json())
       .then((data) => setRooms(data))
       .catch((err) => console.error("Error fetching rooms:", err));
+  };
+
+      fetchRooms();
+      const interval = setInterval(fetchRooms, 3000); 
+      return () => clearInterval(interval); 
   }, []);
 
   const joinRoom = async (roomName) => {
@@ -57,7 +63,7 @@ function RoomList({ setToken, username }) {
                 <div className="room-info">
                   <span className="room-name">{room.roomId}</span>
                   <span className="room-meta">
-                    {room.participantCount ?? 0} participant{room.participantCount !== 1 ? "s" : ""}
+                    {room.participantCount ?? 0} / {room.maxUsers} participant{room.participantCount !== 1 ? "s" : ""}
                   </span>
                 </div>
               </div>

@@ -3,6 +3,7 @@ const fetch = require("node-fetch");
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const crypto = require("crypto");
 const { AccessToken, RoomServiceClient, WebhookReceiver } = require("livekit-server-sdk");
 
 const app = express();
@@ -78,6 +79,7 @@ app.post("/connect", async (req, res) => {
       process.env.LIVEKIT_API_KEY,
       process.env.LIVEKIT_API_SECRET
     );
+    const identity = `${username}-${crypto.randomUUID().slice(0, 6)}`;
 
     if (action === "host") {
       if (room) {
@@ -101,7 +103,7 @@ app.post("/connect", async (req, res) => {
       const token = new AccessToken(
         process.env.LIVEKIT_API_KEY,
         process.env.LIVEKIT_API_SECRET,
-        { identity: username, name: username }
+        { identity: identity, name: username }
       );
       token.addGrant({
         roomJoin: true,
@@ -132,7 +134,7 @@ app.post("/connect", async (req, res) => {
       const token = new AccessToken(
         process.env.LIVEKIT_API_KEY,
         process.env.LIVEKIT_API_SECRET,
-        { identity: username, name: username }
+        { identity: identity, name: username }
       );
       token.addGrant({
         roomJoin: true,

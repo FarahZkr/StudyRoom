@@ -1,9 +1,14 @@
 .room {
     display: flex;
+    position: relative;
+    width: 100%;
     flex-direction: column;
-    height: 100vh;
-    background: linear-gradient(135deg, #e8e0f5 0%, #dce8f7 50%, #f0e0f5 100%);
     font-family: 'Google Sans', Roboto, sans-serif;
+    padding: 3rem;
+    padding-inline: 1rem;
+    padding-bottom: 1rem;
+    background: #514e4e;
+    /* background: linear-gradient(135deg, #e8e0f5 0%, #dce8f7 50%, #f0e0f5 100%); */
 }
 
 .main-container {
@@ -16,20 +21,22 @@
 
 .video-container {
     display: flex;
+    position: relative;
     width: 100%;
     justify-content: center;
     align-items: center;
-    padding: 16px;
     overflow: hidden;
+    border-radius: 10px;
+    background: #494949;
 }
 
 .video-grid {
     display: grid;
-    gap: 8px;
-    width: 100%;
-    max-width: 1200px;
+    gap: 11px;
+    width: 90%;
     max-height: calc(100vh - 80px);
     align-content: center;
+    justify-items: center;
 }
 
 .participant-tile {
@@ -41,6 +48,13 @@
     width: 100%;
     background-color: #1e1e2e;
     box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    max-width: 70vw;
+}
+
+@media screen and (max-height:800px) {
+    .grid-sm .participant-tile {
+        margin-bottom: 4rem;
+    }
 }
 
 .participant-tile video {
@@ -106,13 +120,13 @@
 
 .camera-off-overlay span {
     background: linear-gradient(45deg, #4f46e5, #a855f7);
-    width: 64px;
-    height: 64px;
+    width: 15%;
+    height: 26%;
+    font-size: 4.5vw;
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 1.6rem;
     color: white;
     font-weight: 500;
     user-select: none;
@@ -120,10 +134,15 @@
 
 .controls {
     display: flex;
+    position: absolute;
     justify-content: center;
     padding: 12px 0 20px;
     background: transparent;
-    border-top: 1px solid rgba(200, 180, 230, 0.5)
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    /* border-top: 1px solid rgba(200, 180, 230, 0.5) */
 }
 
 .controls-container {
@@ -139,9 +158,11 @@
 }
 
 .controls-container button {
-    background: rgba(255, 255, 255, 0.6);
+    background-color: #ccc;
+    /* background: rgba(255, 255, 255, 0.6); */
     outline: none;
-    border: 1px solid rgba(200, 180, 230, 0.3);
+    border: 1px solid white;
+    /* border: 1px solid rgba(200, 180, 230, 0.3); */
     border-radius: 50%;
     width: 44px;
     height: 44px;
@@ -153,21 +174,22 @@
 }
 
 .controls-container button:hover {
-    background: rgba(255, 255, 255, 0.9) !important;
+    background-color: #f2f2f2 !important;
+    /* background: rgba(255, 255, 255, 0.9) !important; */
 }
 
 .controls-container button:active {
-    background: rgba(200, 180, 230, 0.4) !important;
+    background-color: rgb(88, 88, 88);
+    /* background: rgba(200, 180, 230, 0.4) !important; */
 }
 
-.controls svg {
+.controls svg, .volume-container svg {
     width: 20px;
-    color: #4a1d96;
+    color: rgb(32, 32, 32);
     user-select: none;
 }
 
-/* leave button red */
-.controls-container button:last-child {
+.controls-container button#leavebtn {
     background: #ea4335;
     width: auto;
     border-radius: 24px;
@@ -175,11 +197,11 @@
     border: none;
 }
 
-.controls-container button:last-child:hover {
+.controls-container button#leavebtn:hover {
     background: #d93025 !important;
 }
 
-.controls-container button:last-child svg {
+.controls-container button#leavebtn svg {
     color: white;
 }
 
@@ -190,13 +212,56 @@
     width: 360px;
     min-width: 360px;
     height: 100%;
-    background: rgba(255, 255, 255, 0.75);
+    /* background: rgba(255, 255, 255, 0.75); */
     backdrop-filter: blur(12px);
-    border-left: 1px solid rgba(200, 180, 230, 0.5);
+    /* border-left: 1px solid rgba(200, 180, 230, 0.5); */
+    margin-left: 1rem;
+    background-color: gray;
+    border-radius: 10px;
 }
 
 .chat.hidden {
     display: none;
+}
+
+.chat-tabs {
+    display: flex;
+    position: relative;
+    justify-content: space-around;
+    border-bottom: 1px solid rgba(200, 180, 230, 0.4);
+    padding: 1rem 0.5rem;
+    gap: 5px
+}
+
+.chat-active-tab {
+    position: absolute;
+    width: 41%;
+    height: 60%;
+    left: 6%;
+    top: 20%;
+    background-color: #41414142;
+    border-radius: 5px;
+    z-index: -1;
+    transition: left 0.3s ease;
+}
+
+.chat-active-tab.active {
+    left: 53%;
+}
+
+.chat-tab {
+    width: 100%;
+    padding-block: 10px;
+    color: white;
+    cursor: pointer;
+    background: none;
+    border: none;
+}
+
+.chat-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .chat-messages {
@@ -310,4 +375,183 @@
 .chat-input button svg {
     width: 16px;
     color: white;
+}
+
+.screenshare-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background: #000;
+}
+
+.screenshare-overlay video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* contain so the full screen is visible */
+}
+
+#screenShareDisabled {
+    width: 22px !important;
+}
+
+#screenShareEnabled {
+    width: 18px;
+}
+
+.main-header {
+    position: absolute;
+    top: 0.4rem;
+    display: flex;
+    justify-content: space-between;
+    width: calc(100% - 2rem);
+    align-items: center;
+}
+
+.left-header{
+    display: flex;
+}
+
+.left-header-participants {
+    display: flex;
+    background: #494949;
+    align-items: center;
+    margin-left: 5px;
+    border: 1px solid gray;
+    padding: 4px 8px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.left-header-participants svg {
+    margin-left: 5px;
+    width: 20px;
+}
+
+.right-header svg {
+    width: 2.1rem;
+    color: #2e2e2e;
+}
+
+.right-header button {
+    background: none;
+    outline: none;
+    border: none;
+    cursor: pointer;
+}
+
+#roomTimer {
+    background: #494949;
+    padding: 4px 8px;
+    border-radius: 5px;
+    color: #949494;
+    align-content: center;
+}
+
+.volume-parent {
+    position: relative;
+    margin-left: 1px;
+}
+
+.volume-parent button {
+    border: none;
+    width: 42px;
+    height: 42px;
+}
+
+.volume-container {
+    position: absolute;
+    background-color: #cccccc;
+    display: flex;
+    align-items: center;
+    width: calc(100% + 2px);
+    bottom: -2%;
+    left: -1px;
+    flex-direction: column;
+    justify-content: start;
+    box-sizing: border-box;
+    height: 104%;
+    overflow: hidden;
+    z-index: -1;
+    border-radius: 25px;
+    border: 1px solid white;
+    transition: height 0.2s linear;
+}
+
+.volume-container.active {
+    height: 9.5rem;
+}
+
+.volume-container svg {
+    margin-top: 2px;
+}
+
+#rangeSlider {
+  -webkit-appearance: none;
+  appearance: none; 
+  cursor: pointer;
+  outline: none;
+  border-radius: 15px;
+  height: 2px;
+  width: 5rem;
+  background: #ccc;
+  margin-top: 3.5rem;
+  transform: rotate(-90deg);
+}
+
+#rangeSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none; 
+  height: 15px;
+  width: 15px;
+  background-color: black;
+  border-radius: 50%;
+  border: none;
+  transition: .2s ease-in-out;
+}
+
+#rangeSlider::-moz-range-thumb {
+  height: 15px;
+  width: 15px;
+  background-color: black;
+  border-radius: 50%;
+  border: none;
+  transition: .2s ease-in-out;
+}
+
+.user-icon {
+    background-color: rgb(66, 66, 66);
+    width: fit-content;
+    height: fit-content;
+    padding: 3px 3px;
+    border-radius: 50%;
+    padding-bottom: 0px;
+    padding-top: 3px;
+    margin-right: 10px;
+}
+
+.user-profile {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 2rem;
+}
+
+.user-icon svg {
+    width: 16px;
+    color: rgb(117, 117, 117);
+}
+
+.user-values {
+    display: flex;
+    gap: 10px;
+}
+
+.user-values div {
+    height: 100%;
+    width: 1px;
+    background: #5e5e5e;
+    display: inline-block;
+}
+
+.user-values svg {
+    width: 18px;
 }

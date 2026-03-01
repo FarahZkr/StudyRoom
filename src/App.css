@@ -62,3 +62,15 @@ input[type=number] {
 .hidden {
   display: none !important;
 }
+
+.relative {
+  position: relative;
+}
+
+.flex {
+  display: flex;
+}
+
+.lk-room-container {
+  display: flex;
+}

@@ -9,10 +9,6 @@ import RoomUI from './RoomUI';
 function RoomSession({ token, onLeave }) {
   const LIVEKIT_URL = "wss://studyrooms-z2ioh2bj.livekit.cloud";
 
-  useEffect(() => { 
-    console.log("RoomSession received token:", token);
-  }, [token]);
-
   if (!token) {
     return (<div></div>);
   }

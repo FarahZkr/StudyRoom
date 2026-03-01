@@ -21,6 +21,12 @@ function SessionContainer({ token, username, setUsername }) {
       .slice(0, 2);
   };
 
+  function onUsernameChange(input) {
+    if(input == " " && (username.length == 0 || username.length > 0 && username[0] != " "))
+      return;
+    setUsername(input.replace(/[^a-zA-Z\s]/g, ''));
+  }
+
   return (
     <div className="session-container-parent">
       <div className="session-container">
@@ -33,8 +39,9 @@ function SessionContainer({ token, username, setUsername }) {
               type="text"
               placeholder="Enter your name to get started"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={(e) => onUsernameChange(e.target.value)}
               className="username-input"
+              pattern="[a-zA-Z]+"
             />
           </div>
         </div>
