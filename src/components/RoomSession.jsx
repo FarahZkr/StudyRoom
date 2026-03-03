@@ -1,16 +1,31 @@
-import { useEffect } from 'react';
 import './RoomSession.css';
+import { useState } from "react";
 import {
   LiveKitRoom,
+  PreJoin
 } from '@livekit/components-react';
 import '@livekit/components-styles';
 import RoomUI from './RoomUI';
 
-function RoomSession({ token, onLeave }) {
+function RoomSession({ token, onLeave, allowMics }) {
   const LIVEKIT_URL = "wss://studyrooms-z2ioh2bj.livekit.cloud";
+  const [preJoinDone, setPreJoinDone] = useState(false);
+  const [preJoinValues, setPreJoinValues] = useState(null);
 
   if (!token) {
     return (<div></div>);
+  }
+
+  if (!preJoinDone) {
+    return (
+      <PreJoin
+        onSubmit={(values) => {
+          setPreJoinValues(values);
+          setPreJoinDone(true);
+        }}
+        onError={(err) => console.error(err)}
+      />
+    );
   }
 
   return (
@@ -19,9 +34,9 @@ function RoomSession({ token, onLeave }) {
       serverUrl={LIVEKIT_URL}
       connect={true}
       video={true}
-      audio={true}
+      audio={allowMics}
     >
-      <RoomUI onLeave={onLeave}/>
+      <RoomUI onLeave={onLeave} allowMics={allowMics}/>
     </LiveKitRoom>
   );
 }

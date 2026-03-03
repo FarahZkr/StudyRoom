@@ -26,7 +26,7 @@
     transition: all 0.15s;
 }
 
-.room-card:hover {
+.room-card:not(.disabled):hover {
     background: rgba(240, 235, 250, 0.9);
     border-color: #a855f7;
     box-shadow: 0 2px 8px rgba(120, 60, 200, 0.12);
@@ -82,4 +82,26 @@
 
 .join-btn:hover {
     opacity: 0.85;
+}
+
+.join-btn:disabled, .room-card.disabled .join-btn  {
+    background: #d1d5db;
+    color: #9aa0a6;
+    cursor: not-allowed;
+    opacity: 1;
+}
+
+.room-card:has(.join-btn:disabled) {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.room-card:has(.join-btn:disabled):hover {
+    background: rgba(240, 235, 250, 0.6);
+    border-color: rgba(200, 180, 230, 0.4);
+    box-shadow: none;
+}
+
+.room-card.disabled .room-name {
+  color: #616264;
 }

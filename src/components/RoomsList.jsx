@@ -3,7 +3,7 @@ import "./RoomsList.css";
 //process.env.REACT_APP_API_URL ||
 const API_URL =  "http://localhost:3000";
 
-function RoomList({ setToken, username }) {
+function RoomList({ setToken, username, setAllowMics }) {
   const [rooms, setRooms] = useState([]);
 
   useEffect(() => {
@@ -33,17 +33,23 @@ function RoomList({ setToken, username }) {
           isPrivate: false,
           maxUsers: "",
           password: "",
+          allowMics: false,
           username: username.trim(),
           action: "join",
         }),
       });
       const data = await response.json();
+      
       if (!response.ok) {
         // Show specific backend error message
         alert(data.error || "Something went wrong");
         return;
       }
+      const payload = JSON.parse(atob(data.token.split(".")[1]));
+      const metadata = JSON.parse(payload.metadata ?? "{}");
+
       setToken(data.token);
+      setAllowMics(metadata.allowMics);
     } catch (err) {
       console.error("Error joining room:", err);
       alert("Failed to join room. Please try again.");
@@ -57,7 +63,7 @@ function RoomList({ setToken, username }) {
       ) : (
         <ul>
           {rooms.map((room) => (
-            <li key={room._id} className="room-card" onClick={() => joinRoom(room.roomId)}>
+            <li key={room._id} className={room.participantCount==room.maxUsers?"room-card disabled":"room-card"} onClick={() => joinRoom(room.roomId)}>
               <div className="room-card-left">
                 <div className="room-icon">🎧</div>
                 <div className="room-info">
@@ -67,7 +73,8 @@ function RoomList({ setToken, username }) {
                   </span>
                 </div>
               </div>
-              <button type="button" className="join-btn" onClick={(e) => { e.stopPropagation(); joinRoom(room.roomId); }}>
+              <button type="button" className="join-btn" onClick={(e) => { e.stopPropagation(); joinRoom(room.roomId); }}
+               disabled={room.participantCount >= room.maxUsers}>
                 Join
               </button>
             </li>

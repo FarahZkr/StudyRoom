@@ -2,7 +2,7 @@ import { useState } from "react";
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:3000";
 
-function PrivateServer({ setToken, username }) {
+function PrivateServer({ setToken, username, setAllowMics }) {
   const [roomName, setRoomName] = useState("");
   const [password, setPassword] = useState("");
 
@@ -17,15 +17,22 @@ function PrivateServer({ setToken, username }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           roomName: roomName.trim(),
-          password: password.trim(),
-          username: username.trim(),
           isPrivate: true,
+          maxUsers: "",
+          password: password.trim(),
+          allowMics: false,
+          username: username.trim(),
           action: "join",
         }),
       });
       const data = await response.json();
       if (!response.ok) return alert(data.error || "Something went wrong");
+      
+      const payload = JSON.parse(atob(data.token.split(".")[1]));
+      const metadata = JSON.parse(payload.metadata ?? "{}");
+
       setToken(data.token);
+      setAllowMics(metadata.allowMics);
     } catch (err) {
       alert("Failed to join room. Please try again.");
     }

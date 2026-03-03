@@ -474,7 +474,7 @@
     z-index: -1;
     border-radius: 25px;
     border: 1px solid white;
-    transition: height 0.2s linear;
+    /* transition: height 0.2s linear; */
 }
 
 .volume-container.active {

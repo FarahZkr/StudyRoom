@@ -2,23 +2,20 @@ import { useState } from "react";
 //process.env.REACT_APP_API_URL || 
 const API_URL = "http://localhost:3000";
 
-function HostSession({setToken, username}) {
+function HostSession({setToken, username, setMics}) {
   const [roomName, setRoomName] = useState("");
   const [roomPass, setRoomPass] = useState("");
   const [maxUsers, setMaxUsers] = useState(5);
   const [isPrivate, setIsPrivate] = useState(false);
+  const [allowMics, setAllowMics] = useState(true);
 
   function modifyMaxUsers(change) {
     setMaxUsers((prev) => {
       const newValue = prev + change;
-      if (newValue < 0) return 0;
+      if (newValue < 2) return 2;
       else if (newValue > 10) return 10;
       return newValue;
     });
-  }
-
-  function togglePrivate() {
-    setIsPrivate((prev) => !prev);
   }
 
   const hostRoom = async () => {
@@ -26,10 +23,12 @@ function HostSession({setToken, username}) {
     const response = await fetch(`${API_URL}/connect`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ roomName: roomName, isPrivate: isPrivate, maxUsers: maxUsers, password: roomPass, action: "host", username: username.trim() }),
+      body: JSON.stringify({ roomName: roomName, isPrivate: isPrivate, maxUsers: maxUsers, password: roomPass, allowMics: allowMics, action: "host", username: username.trim() }),
     });
-    // Get token if needed
+
     const data = await response.json();
+    
+    setMics(allowMics);
     setToken(data.token);
   };
 
@@ -52,7 +51,7 @@ function HostSession({setToken, username}) {
   return (
     <div className="host-container">
       <label htmlFor="PrivateServer">Private Server</label>
-      <input type="checkbox" id="PrivateServer" onChange={togglePrivate} style={{width: "fit-content"}} />
+      <input type="checkbox" id="PrivateServer" onChange={()=>setIsPrivate(prev=>!prev)} style={{width: "fit-content"}} />
       <label htmlFor="ServerName">Server Name</label>
       <input type="text" id="ServerName" placeholder="Name" value={roomName} onChange={(e) => setRoomName(e.target.value)}/>
       <div
@@ -79,7 +78,9 @@ function HostSession({setToken, username}) {
           ━
         </button>
       </div>
-      <button type="button" className="primary-btn" onClick={hostRoom}>Host</button>
+      <label htmlFor="AllowMics">Allow Mics</label>
+      <input type="checkbox" id="AllowMics" onChange={() => setAllowMics((prev) => !prev)} style={{width: "fit-content"}} checked={allowMics} />
+      <button type="button" className="primary-btn" onClick={hostRoom} style={{marginTop:"10px"}}>Host</button>
     </div>
   );
 }

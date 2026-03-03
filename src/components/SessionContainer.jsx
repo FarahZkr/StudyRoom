@@ -4,7 +4,7 @@ import HostSession from "./HostSession";
 import PrivateServer from "./PrivateSession";
 import RoomsList from "./RoomsList";
 
-function SessionContainer({ token, username, setUsername }) {
+function SessionContainer({ token, username, setUsername, allowMics }) {
   const [tabId, setTabId] = useState(1);
 
   const getInitials = (identity) => {
@@ -69,13 +69,13 @@ function SessionContainer({ token, username, setUsername }) {
             </button>
           )}
           <div className={`tab-content ${tabId === 1 ? "active" : ""}`}>
-            <RoomsList setToken={token} username={username} />
+            <RoomsList setToken={token} username={username} setAllowMics={allowMics}/>
           </div>
           <div className={`tab-content ${tabId === 2 ? "active" : ""}`}>
-            <PrivateServer setToken={token} username={username} />
+            <PrivateServer setToken={token} username={username} setAllowMics={allowMics}/>
           </div>
           <div className={`tab-content ${tabId === 3 ? "active" : ""}`}>
-            <HostSession setToken={token} username={username} />
+            <HostSession setToken={token} username={username} setMics={allowMics}/>
           </div>
         </div>
       </div>

@@ -29,7 +29,6 @@ function ParticipantTile({
   const screenShare = screenShareTracks.find(
     (s) => s.participant.identity === track.participant.identity,
   );
-  console.log(participants);
 
   return (
     <div className="participant-tile">
@@ -87,7 +86,7 @@ function ParticipantTile({
   );
 }
 
-function RoomUI({ onLeave }) {
+function RoomUI({ onLeave, allowMics }) {
   const [totalSeconds, setTotalSeconds] = useState(0);
   const [volume, setVolume] = useState(1);
   const [volumeOpen, setVolumeOpen] = useState(false);
@@ -108,7 +107,6 @@ function RoomUI({ onLeave }) {
   const audioTracks = useTracks([Track.Source.Microphone]);
   const screenShareTracks = useTracks([Track.Source.ScreenShare]);
   const cols = Math.ceil(Math.sqrt(videoTracks.length));
-  const names = participants.map(p => p.identity);
 
   const getInitials = (identity) => {
     return identity
@@ -160,7 +158,6 @@ function RoomUI({ onLeave }) {
   const handleVolumeChange = (e) => {
     const val = parseFloat(e.target.value);
     setVolume(val);
-    // set volume on all remote audio elements
     document.querySelectorAll("audio").forEach((el) => {
       el.volume = val;
     });
@@ -250,20 +247,29 @@ function RoomUI({ onLeave }) {
         <div className="video-container">
           <div className="controls">
             <div className="controls-container">
-              <button
-                onClick={() =>
-                  localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled)
-                }
-              >
-                {isMicrophoneEnabled? 
-                  <>
-                    <MicOnIcon/>
-                  </> : 
-                  <>
-                    <MicOffIcon/>
-                  </>
-                }
-              </button>
+              {allowMics ? (
+                <>
+                  <button
+                    onClick={() =>
+                      localParticipant.setMicrophoneEnabled(
+                        !isMicrophoneEnabled,
+                      )
+                    }
+                  >
+                    {isMicrophoneEnabled ? (
+                      <>
+                        <MicOnIcon />
+                      </>
+                    ) : (
+                      <>
+                        <MicOffIcon />
+                      </>
+                    )}
+                  </button>
+                </>
+              ) : (
+                <></>
+              )}
               <button
                 onClick={() =>
                   localParticipant.setCameraEnabled(!isCameraEnabled)
@@ -447,7 +453,7 @@ function RoomUI({ onLeave }) {
             </div>
           </div>
           <div
-            className={cols < 3? "video-grid grid-sm":"video-grid"}
+            className={cols < 3 ? "video-grid grid-sm" : "video-grid"}
             style={{
               gridTemplateColumns: `repeat(${cols}, 1fr)`,
             }}
@@ -490,37 +496,47 @@ function RoomUI({ onLeave }) {
           <div
             className={chatTabSelected ? "chat-content hidden" : "chat-content"}
           >
-            {participants.map(p => (
+            {participants.map((p) => (
               <div key={p.identity} className="user-profile">
-                <div className="flex" style={{alignItems:"center"}}>
+                <div className="flex" style={{ alignItems: "center" }}>
                   <div className="user-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
-                      <path d="M5 21C5 17.134 8.13401 14 12 14C15.866 14 19 17.134 19 21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                    >
+                      <path
+                        d="M5 21C5 17.134 8.13401 14 12 14C15.866 14 19 17.134 19 21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
                     </svg>
                   </div>
-                  <span>
-                    {p.name}
-                  </span>
+                  <span>{p.name}</span>
                 </div>
-             
+
                 <div className="user-values">
                   <div></div>
-                  {p.isMicrophoneEnabled ? 
+                  {p.isMicrophoneEnabled ? (
                     <>
-                      <MicOnIcon/>
-                    </> :
-                    <>
-                      <MicOffIcon/>
+                      <MicOnIcon />
                     </>
-                  }
-                  {p.isCameraEnabled ? 
+                  ) : (
                     <>
-                      <CameraOnIcon/>
-                    </> :
-                    <>
-                      <CameraOffIcon/>
+                      <MicOffIcon />
                     </>
-                  }
+                  )}
+                  {p.isCameraEnabled ? (
+                    <>
+                      <CameraOnIcon />
+                    </>
+                  ) : (
+                    <>
+                      <CameraOffIcon />
+                    </>
+                  )}
                 </div>
               </div>
             ))}

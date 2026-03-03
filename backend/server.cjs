@@ -31,6 +31,7 @@ const roomSchema = new mongoose.Schema({
   roomId: { type: String, required: true, unique: true },
   isPrivate: { type: Boolean, default: false },
   maxUsers: { type: Number, default: 6 },
+  allowMics: { type: Boolean, default: true },
   password: { type: String },
   createdAt: { type: Date, default: Date.now },
   expiresAt: { type: Date },
@@ -49,8 +50,8 @@ app.get("/rooms", async (req, res) => {
       process.env.LIVEKIT_API_SECRET
     );
 
-    const rooms = await Room.find({isPrivate: false });
-    
+    const rooms = await Room.find({ isPrivate: false });
+
     // fetch live participant count for each room
     const roomsWithCount = await Promise.all(
       rooms.map(async (room) => {
@@ -72,7 +73,7 @@ app.get("/rooms", async (req, res) => {
 // Connect / join room
 app.post("/connect", async (req, res) => {
   try {
-    const { roomName, isPrivate, maxUsers, password, action, username } = req.body;
+    const { roomName, isPrivate, maxUsers, password, allowMics, action, username } = req.body;
     let room = await Room.findOne({ roomId: roomName });
     const roomService = new RoomServiceClient(
       process.env.LIVEKIT_URL,
@@ -89,6 +90,7 @@ app.post("/connect", async (req, res) => {
         roomId: roomName,
         isPrivate: isPrivate,
         maxUsers: maxUsers,
+        allowMics: allowMics,
         password: password,
         expiresAt: new Date(Date.now() + 1000 * 60 * 60),
       });
@@ -103,7 +105,11 @@ app.post("/connect", async (req, res) => {
       const token = new AccessToken(
         process.env.LIVEKIT_API_KEY,
         process.env.LIVEKIT_API_SECRET,
-        { identity: identity, name: username }
+        { identity: identity, name: username,
+          metadata: JSON.stringify({
+            allowMics: allowMics,
+          }),
+         }
       );
       token.addGrant({
         roomJoin: true,
@@ -126,7 +132,6 @@ app.post("/connect", async (req, res) => {
       // Check room capacity using LiveKit API
       const participants = await roomService.listParticipants(roomName);
       if (participants.length >= room.maxUsers) {
-        console.log(`Room ${roomName} is full. Max users: ${room.maxUsers}`);
         return res.status(403).json({ error: "Room is full" });
       }
 
@@ -134,7 +139,13 @@ app.post("/connect", async (req, res) => {
       const token = new AccessToken(
         process.env.LIVEKIT_API_KEY,
         process.env.LIVEKIT_API_SECRET,
-        { identity: identity, name: username }
+        {
+          identity: identity,
+          name: username,
+          metadata: JSON.stringify({
+            allowMics: room.allowMics,
+          }),
+        }
       );
       token.addGrant({
         roomJoin: true,
