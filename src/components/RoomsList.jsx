@@ -63,7 +63,7 @@ function RoomList({ setToken, username, setAllowMics }) {
       ) : (
         <ul>
           {rooms.map((room) => (
-            <li key={room._id} className={room.participantCount==room.maxUsers?"room-card disabled":"room-card"} onClick={() => joinRoom(room.roomId)}>
+            <li key={room._id} className={room.participantCount===room.maxUsers?"room-card disabled":"room-card"} onClick={() => joinRoom(room.roomId)}>
               <div className="room-card-left">
                 <div className="room-icon">🎧</div>
                 <div className="room-info">

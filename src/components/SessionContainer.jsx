@@ -22,17 +22,26 @@ function SessionContainer({ token, username, setUsername, allowMics }) {
   };
 
   function onUsernameChange(input) {
-    if(input === " " && (username.length === 0 || (username.length > 0 && username[0] !== " ")))
+    const startsWithSpace = input === " ";
+    const usernameEmpty = username.length === 0;
+    const usernameStartsWithoutSpace =
+      username.length > 0 && username[0] !== " ";
+
+    if (startsWithSpace && (usernameEmpty || usernameStartsWithoutSpace)) {
       return;
-    setUsername(input.replace(/[^a-zA-Z\s]/g, ''));
+    }
+
+    setUsername(input.replace(/[^a-zA-Z\s]/g, ""));
   }
 
   return (
     <div className="session-container-parent">
-      <h3>The study app <span className="accent">just for you.</span></h3>
+      <h3>
+        The study app <span className="accent">just for you.</span>
+      </h3>
       <p className="subtitle">Find a room or create one for others to see!</p>
       <div className="session-container">
-         <div className="username-section">
+        <div className="username-section">
           <div className="username-field">
             <div className="username-avatar">
               {username ? getInitials(username) : "?"}
@@ -65,19 +74,31 @@ function SessionContainer({ token, username, setUsername, allowMics }) {
         </div>
 
         <div className="container-bottom">
-          {(tabId === 1) && (
+          {tabId === 1 && (
             <button id="hostBtn" onClick={() => setTabId(3)}>
               + Host a Room
             </button>
           )}
           <div className={`tab-content ${tabId === 1 ? "active" : ""}`}>
-            <RoomsList setToken={token} username={username} setAllowMics={allowMics}/>
+            <RoomsList
+              setToken={token}
+              username={username}
+              setAllowMics={allowMics}
+            />
           </div>
           <div className={`tab-content ${tabId === 2 ? "active" : ""}`}>
-            <PrivateServer setToken={token} username={username} setAllowMics={allowMics}/>
+            <PrivateServer
+              setToken={token}
+              username={username}
+              setAllowMics={allowMics}
+            />
           </div>
           <div className={`tab-content ${tabId === 3 ? "active" : ""}`}>
-            <HostSession setToken={token} username={username} setMics={allowMics}/>
+            <HostSession
+              setToken={token}
+              username={username}
+              setMics={allowMics}
+            />
           </div>
         </div>
       </div>
