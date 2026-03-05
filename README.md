@@ -1,6 +1,6 @@
 # StudyRoom
 
-StudyRoom is a video collaboration app for small group sessions. There's no sign-up — you pick a name, create or join a room, and you're in. Rooms can be public or password-protected, and they clean themselves up when everyone leaves.
+StudyRoom is a video collaboration app for small group sessions. There's no sign-up. You pick a name, create or join a room, and you're in. Rooms can be public or password-protected, and they clean themselves up when everyone leaves.
 
 Live at: https://study-room-topaz.vercel.app
 
@@ -19,7 +19,7 @@ Live at: https://study-room-topaz.vercel.app
 
 ## How connections work
 
-Rather than peer-to-peer WebRTC — which works fine for two people but gets complicated fast with more — rooms are routed through LiveKit, a self-hostable WebRTC infrastructure layer. Each participant connects to a LiveKit server which handles media routing between everyone in the room. The backend generates a short-lived token per participant, so the LiveKit credentials never touch the client directly.
+Rather than peer-to-peer WebRTC, which works fine for two people but gets complicated fast with more, rooms are routed through LiveKit, a self-hostable WebRTC infrastructure layer. Each participant connects to a LiveKit server which handles media routing between everyone in the room. The backend generates a short-lived token per participant, so the LiveKit credentials never touch the client directly.
 
 ---
 
