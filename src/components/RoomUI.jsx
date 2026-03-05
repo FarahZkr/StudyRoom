@@ -157,19 +157,33 @@ function RoomUI({ onLeave, allowMics, preJoinValues }) {
   };
 
   useEffect(() => {
+    if (!localParticipant) return;
+
     localParticipant.setCameraEnabled(false);
     localParticipant.setMicrophoneEnabled(false);
-    if (room.state !== 'connected') return;
+
+    if (room.state !== "connected") return;
+
     const timer = setTimeout(() => {
       localParticipant.setCameraEnabled(preJoinValues?.videoEnabled ?? false);
+
       if (allowMics) {
-        localParticipant.setMicrophoneEnabled(preJoinValues?.audioEnabled ?? false);
+        localParticipant.setMicrophoneEnabled(
+          preJoinValues?.audioEnabled ?? false
+        );
       }
+
       setViewRoom(true);
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [room.state]);
+  }, [
+    room.state,
+    localParticipant,
+    allowMics,
+    preJoinValues?.audioEnabled,
+    preJoinValues?.videoEnabled,
+  ]);
 
   const pad = (val) => String(val).padStart(2, "0");
   const hours = pad(Math.floor(totalSeconds / 3600));
@@ -177,14 +191,18 @@ function RoomUI({ onLeave, allowMics, preJoinValues }) {
   const seconds = pad(totalSeconds % 60);
 
   useEffect(() => {
+    if (!room.roomInfo?.creationTimeMs) return;
+
     const interval = setInterval(() => {
-      if (!room.roomInfo?.creationTimeMs) return;
       setTotalSeconds(
-        Math.floor((Date.now() - Number(room.roomInfo.creationTimeMs)) / 1000)
+        Math.floor(
+          (Date.now() - Number(room.roomInfo.creationTimeMs)) / 1000
+        )
       );
     }, 1000);
+
     return () => clearInterval(interval);
-  }, []);
+  }, [room.roomInfo?.creationTimeMs]);
 
   const handleVolumeChange = (e) => {
     const val = parseFloat(e.target.value);
