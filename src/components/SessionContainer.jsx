@@ -29,6 +29,8 @@ function SessionContainer({ token, username, setUsername, allowMics }) {
 
   return (
     <div className="session-container-parent">
+      <h3>The study app <span className="accent">just for you.</span></h3>
+      <p className="subtitle">Find a room or create one for others to see!</p>
       <div className="session-container">
          <div className="username-section">
           <div className="username-field">

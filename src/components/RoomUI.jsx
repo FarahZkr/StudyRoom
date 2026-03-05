@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   useLocalParticipant,
   useParticipants,
@@ -24,7 +24,7 @@ function ParticipantTile({
     (p) => p.identity === track.participant.identity,
   );
   const isMuted = !participant?.isMicrophoneEnabled;
-  const isCameraOn = participant?.isCameraEnabled;
+  const isCameraOn = participant?.isCameraEnabled ?? false;
   const isSpeaking = participant?.isSpeaking ?? false;
   const screenShare = screenShareTracks.find(
     (s) => s.participant.identity === track.participant.identity,
@@ -86,14 +86,16 @@ function ParticipantTile({
   );
 }
 
-function RoomUI({ onLeave, allowMics }) {
+function RoomUI({ onLeave, allowMics, preJoinValues }) {
   const [totalSeconds, setTotalSeconds] = useState(0);
   const [volume, setVolume] = useState(1);
   const [volumeOpen, setVolumeOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const [chatTabSelected, setChatTabSelected] = useState(true);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
+  const [viewRoom, setViewRoom] = useState(false);
   const { buttonProps } = useDisconnectButton({ stopTracks: true });
   const {
     localParticipant,
@@ -107,6 +109,11 @@ function RoomUI({ onLeave, allowMics }) {
   const audioTracks = useTracks([Track.Source.Microphone]);
   const screenShareTracks = useTracks([Track.Source.ScreenShare]);
   const cols = Math.ceil(Math.sqrt(videoTracks.length));
+  const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, chatOpen, chatTabSelected]);
 
   const getInitials = (identity) => {
     return identity
@@ -125,35 +132,59 @@ function RoomUI({ onLeave, allowMics }) {
   const { send } = useDataChannel("chat", (msg) => {
     const decoded = JSON.parse(new TextDecoder().decode(msg.payload));
     setMessages((prev) => [...prev, decoded]);
+    if (!chatOpen || !chatTabSelected) setUnreadCount((prev) => prev + 1);
   });
 
   const sendMessage = () => {
-    if (!input.trim()) return;
+    if (!input.trim() || !send) return;
     const time = new Date().toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
     });
-    const msg = { sender: localParticipant.name ?? localParticipant.identity, text: input, time: time };
-    send(new TextEncoder().encode(JSON.stringify(msg)), { reliable: true });
-    setMessages((prev) => [...prev, msg]);
-    setInput("");
+    const msg = { 
+      sender: localParticipant.name ?? localParticipant.identity, 
+      identity: localParticipant.identity, 
+      text: input, 
+      time: time 
+    };
+    try {
+      send(new TextEncoder().encode(JSON.stringify(msg)), { reliable: true });
+      setMessages((prev) => [...prev, msg]);
+      setInput("");
+    } catch (e) {
+      console.error("Failed to send message:", e);
+    }
   };
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (!room.metadata && !room.roomInfo && !room.roomInfo.creationTimeMs)
-        return;
-      setTotalSeconds(
-        Math.floor((Date.now() - Number(room.roomInfo.creationTimeMs)) / 1000),
-      );
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
+    localParticipant.setCameraEnabled(false);
+    localParticipant.setMicrophoneEnabled(false);
+    if (room.state !== 'connected') return;
+    const timer = setTimeout(() => {
+      localParticipant.setCameraEnabled(preJoinValues?.videoEnabled ?? false);
+      if (allowMics) {
+        localParticipant.setMicrophoneEnabled(preJoinValues?.audioEnabled ?? false);
+      }
+      setViewRoom(true);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [room.state]);
 
   const pad = (val) => String(val).padStart(2, "0");
   const hours = pad(Math.floor(totalSeconds / 3600));
   const minutes = pad(Math.floor((totalSeconds % 3600) / 60));
   const seconds = pad(totalSeconds % 60);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!room.roomInfo?.creationTimeMs) return;
+      setTotalSeconds(
+        Math.floor((Date.now() - Number(room.roomInfo.creationTimeMs)) / 1000)
+      );
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleVolumeChange = (e) => {
     const val = parseFloat(e.target.value);
@@ -162,13 +193,14 @@ function RoomUI({ onLeave, allowMics }) {
       el.volume = val;
     });
   };
+
   const MicOffIcon = () => (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd"><g><rect fillRule="nonzero" x="0" y="0" width="24" height="24"></rect><rect stroke="currentColor" strokeWidth="2" strokeLinecap="round" x="9" y="3" width="6" height="11" rx="3"></rect><line x1="12" y1="18" x2="12" y2="21" stroke="currentColor" strokeWidth="2" strokeLinecap="round"></line><line x1="8" y1="21" x2="16" y2="21" stroke="currentColor" strokeWidth="2" strokeLinecap="round"></line><path d="M19,11 C19,14.866 15.866,18 12,18 C8.13401,18 5,14.866 5,11" stroke="currentColor" strokeWidth="2" strokeLinecap="round"></path><line x1="3" y1="3" x2="21" y2="21" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></g></g></svg>);
   const MicOnIcon = () => (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd"><g><rect fillRule="nonzero" x="0" y="0" width="24" height="24"></rect><rect stroke="currentColor" strokeWidth="2" strokeLinecap="round" x="9" y="3" width="6" height="11" rx="3"></rect><line x1="12" y1="18" x2="12" y2="21" stroke="currentColor" strokeWidth="2" strokeLinecap="round"></line><line x1="8" y1="21" x2="16" y2="21" stroke="currentColor" strokeWidth="2" strokeLinecap="round"></line><path d="M19,11 C19,14.866 15.866,18 12,18 C8.13401,18 5,14.866 5,11" stroke="currentColor" strokeWidth="2" strokeLinecap="round"></path></g></g></svg>);
   const CameraOnIcon = () => (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><path d="M16 10L18.5768 8.45392C19.3699 7.97803 19.7665 7.74009 20.0928 7.77051C20.3773 7.79703 20.6369 7.944 20.806 8.17433C21 8.43848 21 8.90095 21 9.8259V14.1741C21 15.099 21 15.5615 20.806 15.8257C20.6369 16.056 20.3773 16.203 20.0928 16.2295C19.7665 16.2599 19.3699 16.022 18.5768 15.5461L16 14M6.2 18H12.8C13.9201 18 14.4802 18 14.908 17.782C15.2843 17.5903 15.5903 17.2843 15.782 16.908C16 16.4802 16 15.9201 16 14.8V9.2C16 8.0799 16 7.51984 15.782 7.09202C15.5903 6.71569 15.2843 6.40973 14.908 6.21799C14.4802 6 13.9201 6 12.8 6H6.2C5.0799 6 4.51984 6 4.09202 6.21799C3.71569 6.40973 3.40973 6.71569 3.21799 7.09202C3 7.51984 3 8.07989 3 9.2V14.8C3 15.9201 3 16.4802 3.21799 16.908C3.40973 17.2843 3.71569 17.5903 4.09202 17.782C4.51984 18 5.07989 18 6.2 18Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>);
   const CameraOffIcon = () => (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><path d="M16 10L18.5768 8.45392C19.3699 7.97803 19.7665 7.74009 20.0928 7.77051C20.3773 7.79703 20.6369 7.944 20.806 8.17433C21 8.43848 21 8.90095 21 9.8259V14.1741C21 15.099 21 15.5615 20.806 15.8257C20.6369 16.056 20.3773 16.203 20.0928 16.2295C19.7665 16.2599 19.3699 16.022 18.5768 15.5461L16 14M6.2 18H12.8C13.9201 18 14.4802 18 14.908 17.782C15.2843 17.5903 15.5903 17.2843 15.782 16.908C16 16.4802 16 15.9201 16 14.8V9.2C16 8.0799 16 7.51984 15.782 7.09202C15.5903 6.71569 15.2843 6.40973 14.908 6.21799C14.4802 6 13.9201 6 12.8 6H6.2C5.0799 6 4.51984 6 4.09202 6.21799C3.71569 6.40973 3.40973 6.71569 3.21799 7.09202C3 7.51984 3 8.07989 3 9.2V14.8C3 15.9201 3 16.4802 3.21799 16.908C3.40973 17.2843 3.71569 17.5903 4.09202 17.782C4.51984 18 5.07989 18 6.2 18Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><line x1="3" y1="3" x2="21" y2="21" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>);
 
   return (
-    <div className="room">
+    <div className="room" style={{ visibility: viewRoom ? 'visible' : 'hidden' }}>
       <div className="main-header">
         <div className="left-header">
           <div id="roomTimer">
@@ -225,7 +257,13 @@ function RoomUI({ onLeave, allowMics }) {
           </div>
         </div>
         <div className="right-header">
-          <button type="button" onClick={() => setChatOpen((prev) => !prev)}>
+          <button type="button" className="relative" onClick={() => { setChatOpen((prev) => !prev); if(chatTabSelected){setUnreadCount(0);}}}>
+              {unreadCount>0?
+                <>
+                  <div className="chat-notif" style={{ left: "59%", top: "22%" }}></div>
+                </> :
+                ""
+              }
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -478,11 +516,17 @@ function RoomUI({ onLeave, allowMics }) {
                 chatTabSelected ? "chat-active-tab" : "chat-active-tab active"
               }
             ></div>
-            <button
-              className="chat-tab"
+            <button 
+              className="chat-tab relative"
               type="button"
-              onClick={() => setChatTabSelected(true)}
+              onClick={() => {setChatTabSelected(true); setUnreadCount(0);}}
             >
+              {unreadCount>0?
+                <>
+                  <div className="chat-notif"></div>
+                </> :
+                ""
+              }
               Chat
             </button>
             <button
@@ -514,7 +558,11 @@ function RoomUI({ onLeave, allowMics }) {
                       />
                     </svg>
                   </div>
-                  <span>{p.name}</span>
+                  <span>{p.name} 
+                    {p.identity === localParticipant.identity
+                    ? " (You)"
+                    : p.name}
+                  </span>
                 </div>
 
                 <div className="user-values">
@@ -558,6 +606,7 @@ function RoomUI({ onLeave, allowMics }) {
                   </div>
                 </div>
               ))}
+              <div ref={messagesEndRef} />
             </div>
             <div className="chat-input">
               <input
