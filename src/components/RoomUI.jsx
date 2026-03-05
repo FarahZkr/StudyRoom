@@ -157,11 +157,6 @@ function RoomUI({ onLeave, allowMics, preJoinValues }) {
   };
 
   useEffect(() => {
-    if (!localParticipant) return;
-
-    localParticipant.setCameraEnabled(false);
-    localParticipant.setMicrophoneEnabled(false);
-
     if (room.state !== "connected") return;
 
     const timer = setTimeout(() => {
@@ -172,7 +167,6 @@ function RoomUI({ onLeave, allowMics, preJoinValues }) {
           preJoinValues?.audioEnabled ?? false
         );
       }
-
       setViewRoom(true);
     }, 500);
 
