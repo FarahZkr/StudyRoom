@@ -1,6 +1,5 @@
 import { useState } from "react";
-//process.env.REACT_APP_API_URL || 
-const API_URL = "http://localhost:3000";
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:3000";
 
 function HostSession({setToken, username, setMics}) {
   const [roomName, setRoomName] = useState("");
