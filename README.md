@@ -1,70 +1,82 @@
-# Getting Started with Create React App
+# StudyRoom
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A browser-based video collaboration app built for small group sessions. Users can create or join public and private rooms, communicate over video and audio, and chat in real time — no account required.
 
-## Available Scripts
+Live at: https://study-room-topaz.vercel.app
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## What it does
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- Create a public or private study room with a custom name and optional password
+- Browse and join active public rooms from the lobby
+- Pre-join screen to configure camera and microphone before entering
+- Real-time video grid that adapts to the number of participants
+- In-room text chat with participant avatars and timestamps
+- Participant panel showing who is in the room and their mic/camera status
+- Speaking indicator and mute/camera-off overlays per participant
+- Screen sharing support
+- Rooms are automatically removed from the list when the last participant leaves
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+---
 
-### `npm test`
+## Tech stack
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+**Frontend** — React, LiveKit Components React, livekit-client
 
-### `npm run build`
+**Backend** — Node.js, Express, MongoDB (Mongoose), LiveKit Server SDK
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+**Infrastructure** — LiveKit Cloud for WebRTC, Vercel (frontend), Railway (backend), MongoDB Atlas
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+---
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Running locally
 
-### `npm run eject`
+### Prerequisites
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+- Node.js
+- A [LiveKit Cloud](https://livekit.io) account
+- A MongoDB Atlas cluster (or local MongoDB)
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Backend
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```bash
+cd backend
+npm install
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Create a `.env` file in the `backend` folder:
 
-## Learn More
+```
+LIVEKIT_URL=wss://your-app.livekit.cloud
+LIVEKIT_API_KEY=your_key
+LIVEKIT_API_SECRET=your_secret
+MONGODB_URI=your_mongodb_connection_string
+PORT=3000
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```bash
+node server.cjs
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Frontend
 
-### Code Splitting
+```bash
+npm install
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+Create a `.env` file in the root:
 
-### Analyzing the Bundle Size
+```
+REACT_APP_API_URL=http://localhost:3000
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```bash
+npm start
+```
 
-### Making a Progressive Web App
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## Notes
 
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Rooms expire automatically after one hour or when all participants have left, whichever comes first. Private rooms require a password to join and do not appear in the public room list.
