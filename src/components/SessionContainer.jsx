@@ -22,7 +22,7 @@ function SessionContainer({ token, username, setUsername, allowMics }) {
   };
 
   function onUsernameChange(input) {
-    if(input == " " && (username.length == 0 || username.length > 0 && username[0] != " "))
+    if(input === " " && (username.length === 0 || (username.length > 0 && username[0] !== " ")))
       return;
     setUsername(input.replace(/[^a-zA-Z\s]/g, ''));
   }
@@ -65,7 +65,7 @@ function SessionContainer({ token, username, setUsername, allowMics }) {
         </div>
 
         <div className="container-bottom">
-          {tabId === 1 && (
+          {(tabId === 1) && (
             <button id="hostBtn" onClick={() => setTabId(3)}>
               + Host a Room
             </button>
