@@ -7,8 +7,16 @@ import RoomUI from './RoomUI';
 function RoomSession({ token, onLeave, allowMics }) {
   const LIVEKIT_URL = "wss://studyrooms-z2ioh2bj.livekit.cloud";
   const [preJoinValues, setPreJoinValues] = useState(null);
-  const [camOn, setCamOn] = useState(true);
-  const [micOn, setMicOn] = useState(allowMics);
+  const [camOn, setCamOn] = useState(() => {
+    const saved = localStorage.getItem("camOn");
+    return saved !== null ? saved === "true" : true;
+  });
+
+  const [micOn, setMicOn] = useState(() => {
+    if (!allowMics) return false;
+    const saved = localStorage.getItem("micOn");
+    return saved !== null ? saved === "true" : false;
+  });
   const videoRef = useRef(null);
   const streamRef = useRef(null);
 
@@ -29,6 +37,8 @@ function RoomSession({ token, onLeave, allowMics }) {
 
   const handleJoin = () => {
     streamRef.current?.getTracks().forEach(t => t.stop());
+    localStorage.setItem("camOn", camOn);
+    localStorage.setItem("micOn", micOn);
     setPreJoinValues({ videoEnabled: camOn, audioEnabled: micOn });
   };
 

@@ -5,7 +5,7 @@ import SessionContainer from './components/SessionContainer';
 
 function App() {
   const [token, setToken] = useState("");
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState(localStorage.getItem("username") || "");
   const [hasJoined, setHasJoined] = useState(false);
   const [allowMics, setAllowMics] = useState(true);
 

@@ -31,7 +31,9 @@ function SessionContainer({ token, username, setUsername, allowMics }) {
       return;
     }
 
-    setUsername(input.replace(/[^a-zA-Z\s]/g, ""));
+    const name = input.replace(/[^a-zA-Z\s]/g, "")
+    setUsername(name);
+    localStorage.setItem("username", name);
   }
 
   return (
