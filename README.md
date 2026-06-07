@@ -2,6 +2,8 @@
 
 StudyRoom is a video collaboration app for small group sessions. There's no sign-up. You pick a name, create or join a room, and you're in. Rooms can be public or password-protected, and they clean themselves up when everyone leaves.
 
+<img width="861" height="707" alt="Screenshot 2026-06-07 at 7 51 01 PM" src="https://github.com/user-attachments/assets/0fc8502e-1d7a-4866-a82b-c44366d0deda" />
+
 Live at: https://study-room-topaz.vercel.app
 
 ---
