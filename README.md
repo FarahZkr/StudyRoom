@@ -4,7 +4,6 @@ StudyRoom is a video collaboration app for small group sessions. There's no sign
 
 <img width="861" height="707" alt="Screenshot 2026-06-07 at 7 51 01 PM" src="https://github.com/user-attachments/assets/0fc8502e-1d7a-4866-a82b-c44366d0deda" />
 
-Live at: https://study-room-topaz.vercel.app
 
 ---
 
