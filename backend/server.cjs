@@ -4,6 +4,7 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const crypto = require("crypto");
+const bcrypt = require("bcrypt");
 const { AccessToken, RoomServiceClient, WebhookReceiver } = require("livekit-server-sdk");
 
 const app = express();
@@ -86,14 +87,16 @@ app.post("/connect", async (req, res) => {
       if (room) {
         return res.status(400).json({ error: "Room name already exists" });
       }
+
       room = new Room({
         roomId: roomName,
         isPrivate: isPrivate,
         maxUsers: maxUsers,
         allowMics: allowMics,
-        password: password,
         expiresAt: new Date(Date.now() + 1000 * 60 * 60),
       });
+
+      room.password = isPrivate ? await bcrypt.hash(password, 10) : undefined;
 
       await room.save();
       // Create the room in LiveKit using the REST API
@@ -125,8 +128,11 @@ app.post("/connect", async (req, res) => {
       if (!room) {
         return res.status(404).json({ error: "Room not found" });
       }
-      if (room.isPrivate && room.password !== password) {
-        return res.status(401).json({ error: "Incorrect password" });
+      if (room.isPrivate) {
+        const isMatch = await bcrypt.compare(password, room.password);
+        if (!isMatch) {
+          return res.status(401).json({ error: "Incorrect password" });
+        }
       }
 
       // Check room capacity using LiveKit API
