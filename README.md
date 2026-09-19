@@ -1,40 +1,33 @@
 # StudyRoom
 
-StudyRoom is a video collaboration app for small group sessions. There's no sign-up. You pick a name, create or join a room, and you're in. Rooms can be public or password-protected, and they clean themselves up when everyone leaves.
+A video chat app for small group sessions, no sign-up required. Create public or private rooms joinable via a password. The rooms automatically close once everyone leaves.
 
 <img width="861" height="707" alt="Screenshot 2026-06-07 at 7 51 01 PM" src="https://github.com/user-attachments/assets/0fc8502e-1d7a-4866-a82b-c44366d0deda" />
-
 
 ---
 
 ## Features
 
-- Public and private rooms with optional password protection
-- Pre-join screen to set up your camera and mic before entering
-- Adaptive video grid, speaking indicators, and per-participant mute/camera overlays
-- Real-time chat with a participant list showing everyone's mic and camera status
+- Public or password-protected rooms
+- Pre-join screen to check your camera and mic first
+- Adaptive video grid with speaking indicators and mute/camera status per person
+- Real-time chat, with a participant list showing who's muted or off-camera
 - Screen sharing
-- Rooms expire after one hour or when the last person leaves
+- Rooms auto-expire after an hour or when the last person leaves
 
----
+## Why LiveKit instead of raw WebRTC
 
-## How connections work
-
-Rather than peer-to-peer WebRTC, which works fine for two people but gets complicated fast with more, rooms are routed through LiveKit, a self-hostable WebRTC infrastructure layer. Each participant connects to a LiveKit server which handles media routing between everyone in the room. The backend generates a short-lived token per participant, so the LiveKit credentials never touch the client directly.
-
----
+To scale beyond peer-to-peer WebRTC, I integrated LiveKit as a central media server. Instead of sending a separate stream to every joined participant, each user only uploads their stream once to the server, making multi-user rooms significantly more efficient.
 
 ## Stack
 
-React, LiveKit, Node.js, Express, MongoDB, deployed on Vercel and Railway.
+React, LiveKit, Node.js, Express, MongoDB — deployed on Vercel and Railway.
 
----
+## Running it locally
 
-## Running locally
+Requires a LiveKit Cloud project and a MongoDB instance.
 
-You'll need a [LiveKit Cloud](https://livekit.io) project and a MongoDB instance to run this yourself.
-
-**Backend** — create a `.env` in the `backend` folder:
+**Backend** — create `.env` in the `backend` folder:
 
 ```
 LIVEKIT_URL=wss://your-app.livekit.cloud
@@ -48,7 +41,7 @@ PORT=3000
 cd backend && npm install && node server.cjs
 ```
 
-**Frontend** — create a `.env` in the root:
+**Frontend** — create `.env` in the root:
 
 ```
 REACT_APP_API_URL=http://localhost:3000
