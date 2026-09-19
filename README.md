@@ -19,6 +19,16 @@ A video chat app for small group sessions, no sign-up required. Create public or
 
 To scale beyond peer-to-peer WebRTC, I integrated LiveKit as a central media server. Instead of sending a separate stream to every joined participant, each user only uploads their stream once to the server, making multi-user rooms significantly more efficient.
 
+## Data and Room Cleanup
+
+Each room lives in MongoDB, where it stores the room name, password (if the room is private), maximum number of participants, and an expiry timestamp. Private room passwords are hashed with bcrypt before being stored, never saved as plain text.
+
+When the last participant leaves, LiveKit sends a webhook to the backend, which checks the room's live participant count and deletes it immediately if it's empty. As a fallback, every room also has a MongoDB TTL index that deletes it automatically after one hour, in case the webhook doesn't fire for any reason.
+
+## Live room list
+
+The frontend polls `/rooms` every 3 seconds to keep the public room list and participant counts up to date, rather than requiring a manual refresh.
+
 ## Stack
 
 React, LiveKit, Node.js, Express, MongoDB — deployed on Vercel and Railway.
