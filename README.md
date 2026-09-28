@@ -31,7 +31,7 @@ The frontend polls `/rooms` every 3 seconds to keep the public room list and par
 
 ## Stack
 
-React, LiveKit, Node.js, Express, MongoDB — deployed on Vercel and Railway.
+React, LiveKit, Node.js, Express, MongoDB — deployed on Vercel and Render.
 
 ## Running it locally
 
